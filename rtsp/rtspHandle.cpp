@@ -18,6 +18,7 @@ RTSPHandle::RTSPHandle(std::string rtsp_url)
         this->packetIterator->open(rtsp_url, true, false);          // 不成功会直接退出，不会开启线程
         if (this->packetIterator->videoIsOK())
         {
+            matQueue = std::make_shared<MatQueue>();
             rtspInfo.video_time_base = this->packetIterator->time_base();
             AVCodecContext *codecContext = this->packetIterator->video_codecCtx();
             this->videoDecoder = std::make_shared<VideoDecoder>(codecContext);
@@ -50,17 +51,12 @@ RTSPHandle::~RTSPHandle()
 bool RTSPHandle::getFrame(cv::Mat &Frame)
 {
     SPDLOG_TRACE("RTSPHandle::getFrame()");
-    std::unique_lock<std::mutex> lock(this->m_mutex);
-    try
+    if (matQueue->get(Frame, false) == 0)
     {
-        Frame = this->frame.clone();
+        SPDLOG_DEBUG("mat_queque.get: {0}", matQueue->size());
         return true;
     }
-    catch(const std::exception& e)
-    {
-        SPDLOG_ERROR("RTSPHandle::getFrame() exception: '{0}'", e.what());
-        return false;
-    }
+    return false;
 }
 /// @brief 停止拉流
 void RTSPHandle::stop()
@@ -152,10 +148,7 @@ void RTSPHandle::decodeRtsp()
         auto f_onConverted2Mat = [=](cv::Mat &mat)
         {
             SPDLOG_TRACE("decoding_video onConverted2Mat: rows {0} cols {1}", mat.rows, mat.cols);
-            // 修复帧重复的问题
-            std::unique_lock<std::mutex> lock(this->m_mutex);
-            this->frame = mat;
-            SPDLOG_TRACE("decoding_video onConverted2Mat: frame_ready");
+            matQueue->put(mat);
         };
 
         // 处理解码后的帧数据

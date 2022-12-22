@@ -11,7 +11,6 @@ pkg_check_modules(FFMPEG REQUIRED IMPORTED_TARGET libavcodec
                                                     libavfilter 
                                                     libavdevice 
                                                     libavresample)
-# target_link_directories(${PROJECT_NAME} PRIVATE PkgConfig::ffmpeg)
 
 #spdlog
 find_package(spdlog REQUIRED)
@@ -25,11 +24,9 @@ find_package(SDL2 REQUIRED)
 
 #libmpp
 pkg_check_modules(LIBMPP REQUIRED IMPORTED_TARGET rockchip_mpp)
-# target_link_directories(${PROJECT_NAME} PRIVATE PkgConfig::LIBMPP)
 
 #libdrm
 pkg_check_modules(LIBDRM REQUIRED IMPORTED_TARGET libdrm)
-# target_link_directories(${PROJECT_NAME} PRIVATE PkgConfig::LIBDRM)
 
 include_directories(${CMAKE_CURRENT_SOURCE_DIR})
 file(GLOB_RECURSE SRC_FILES ${CMAKE_CURRENT_SOURCE_DIR}/*.cpp)

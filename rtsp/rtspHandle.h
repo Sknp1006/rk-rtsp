@@ -8,6 +8,7 @@
 #include "PacketIterator.h"
 #include "VideoDecoder.h"
 #include "VideoImageConverter.h"
+#include "MatQueue.h"
 
 using namespace av;
 
@@ -108,6 +109,7 @@ private:
     std::shared_ptr<PacketIterator> packetIterator;
     std::shared_ptr<VideoDecoder> videoDecoder;
     std::shared_ptr<VideoImageConverter> videoImageConverter;
+    std::shared_ptr<MatQueue> matQueue;
 
     // 拉流线程
     std::atomic<RTSPState> is_iterating_packet;
