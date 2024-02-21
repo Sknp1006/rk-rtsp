@@ -1,0 +1,14 @@
+prefix=/home/linaro/ffmpeg
+exec_prefix=${prefix}
+libdir=/home/linaro/ffmpeg/lib
+includedir=/home/linaro/ffmpeg/include
+
+Name: libswscale
+Description: FFmpeg image rescaling library
+Version: 7.1.100
+Requires: 
+Requires.private: libavutil >= 58.2.100
+Conflicts:
+Libs: -L${libdir}  -lswscale 
+Libs.private: -lm -latomic
+Cflags: -I${includedir}
