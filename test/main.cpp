@@ -1,16 +1,30 @@
-#include "rtsp/rtspHandle.h"
+#include "rtspHandle.h"
+#include <signal.h>
+#include "logger.h"
+
+static int exit_sig = 0;
+
+void exit_signal(int sig)
+{
+    exit_sig = 1;
+}
 
 int main(int argc, char **argv)
 {
+    commons::Log::init("./");
     std::string url = std::string(argv[1]);
+    SPDLOG_DEBUG("url: {}", url.c_str());
     RTSPHandle handle = RTSPHandle(url);
 
-    while (true)
+    signal(SIGTERM, exit_signal);
+
+    cv::Mat frame;
+    while (!exit_sig)
     {
-        cv::Mat frame;
         if (handle.getFrame(frame))
         {
-            printf("Frame: %d x %d\n", frame.cols, frame.rows);
+            SPDLOG_INFO("get frame: {} x {}", frame.size().width, frame.size().height);
+            std::this_thread::sleep_for(std::chrono::milliseconds(50));
         }
     }
 }
