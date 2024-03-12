@@ -1,48 +1,48 @@
 project(rtsp LANGUAGES CXX C)
 
-#ffmpeg6.0
-set(FFMPEG_DIR ${3rdparty_DIR}/ffmpeg)
-include_directories(${FFMPEG_DIR}/include)
-link_directories(${FFMPEG_DIR}/lib)
-set(FFMPEG_LIBS libavcodec.a
-                libavdevice.a
-                libavfilter.a
-                libavformat.a
-                libavutil.a
-                libswresample.a 
-                libswscale.a)
+
+find_package(PkgConfig REQUIRED)
+
+#jellyfin-ffmpeg6.0
+pkg_check_modules(FFMPEG REQUIRED IMPORTED_TARGET libavcodec 
+                                                    libavformat 
+                                                    libavutil 
+                                                    libswscale 
+                                                    libavfilter 
+                                                    libavdevice 
+                                                    libavresample)
+# target_link_directories(${PROJECT_NAME} PRIVATE PkgConfig::ffmpeg)
 
 #spdlog
-set(SPDLOG_DIR ${3rdparty_DIR}/spdlog)
-include_directories(${SPDLOG_DIR}/include)
-link_directories(${SPDLOG_DIR}/lib)
+find_package(spdlog REQUIRED)
 
 #opencv4
-find_package(OpenCV REQUIRED PATHS ${3rdparty_DIR}/opencv NO_DEFAULT_PATH)
-# list(APPEND OPENCV_LIBS opencv_core opencv_imgproc opencv_imgcodecs)
-list(APPEND OPENCV_LIBS opencv_world)
+find_package(OpenCV REQUIRED COMPONENTS core imgproc imgcodecs)
+list(APPEND OPENCV_LIBS opencv_core opencv_imgproc opencv_imgcodecs)
 
 #SDL2
-set(SDL2_DIR ${3rdparty_DIR}/SDL2/SDL2)
-include_directories(${SDL2_DIR}/include)
-link_directories(${SDL2_DIR}/lib)
+find_package(SDL2 REQUIRED)
 
 #libmpp
-set(LIBMPP_DIR ${3rdparty_DIR}/libmpp)
-link_directories(${LIBMPP_DIR}/lib)
-list(APPEND RKMPP_LIBS rockchip_mpp)
+pkg_check_modules(LIBMPP REQUIRED IMPORTED_TARGET rockchip_mpp)
+# target_link_directories(${PROJECT_NAME} PRIVATE PkgConfig::LIBMPP)
 
 #libdrm
-set(LIBDRM_DIR ${3rdparty_DIR}/libdrm)
-link_directories(${LIBDRM_DIR}/lib)
-list(APPEND LIBDRM_LIBS drm)
+pkg_check_modules(LIBDRM REQUIRED IMPORTED_TARGET libdrm)
+# target_link_directories(${PROJECT_NAME} PRIVATE PkgConfig::LIBDRM)
 
 include_directories(${CMAKE_CURRENT_SOURCE_DIR})
 file(GLOB_RECURSE SRC_FILES ${CMAKE_CURRENT_SOURCE_DIR}/*.cpp)
 list(FILTER SRC_FILES EXCLUDE REGEX "main\\.cpp$")
 
-add_library(rtsp STATIC ${SRC_FILES})
-target_link_libraries(rtsp PRIVATE ${FFMPEG_LIBS} ${OPENCV_LIBS} spdlog SDL2 ${RKMPP_LIBS} ${LIBDRM_LIBS})
+message("BUILD: ${PROJECT_NAME}")
+add_library(${PROJECT_NAME} STATIC ${SRC_FILES})
+target_link_libraries(${PROJECT_NAME} PRIVATE 
+                                            PkgConfig::FFMPEG 
+                                            spdlog::spdlog 
+                                            ${OPENCV_LIBS} 
+                                            PkgConfig::LIBMPP 
+                                            PkgConfig::LIBDRM)
 
 install(TARGETS rtsp DESTINATION lib)
 file(GLOB HEADERS ${CMAKE_CURRENT_SOURCE_DIR}/*.h)

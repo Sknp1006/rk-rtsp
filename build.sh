@@ -2,6 +2,7 @@
 set -e
 
 TARGET_SOC="RK3588"
+BUILD_TYPE="Release"
 
 # 获取绝对路径
 ROOT_PWD=$( cd "$( dirname $0 )" && cd -P "$( dirname "$SOURCE" )" && pwd )
@@ -14,9 +15,13 @@ fi
 
 cd ${BUILD_DIR}
 cmake -B . -S ${ROOT_PWD} \
-    -DCMAKE_BUILD_TYPE=Release \
+    -DCMAKE_BUILD_TYPE=${BUILD_TYPE} \
+    -DSDK_BUILD_TYPE=${SDK_BUILD_TYPE} \
     -DTARGET_SOC=${TARGET_SOC} \
-    -DCMAKE_C_COMPILER=aarch64-linux-gnu-gcc \
-    -DCMAKE_CXX_COMPILER=aarch64-linux-gnu-g++
-make -j4
-make install
+    -DCMAKE_C_COMPILER=gcc \
+    -DCMAKE_CXX_COMPILER=g++ \
+    -DCMAKE_MAKE_PROGRAM=ninja \
+    -GNinja
+
+ninja
+ninja install
