@@ -16,7 +16,7 @@ if (CMAKE_BUILD_TYPE STREQUAL "Debug")
         -g      #包含调试信息
         -fPIC   #位置无关代码
     )
-    add_compile_definitions(SPDLOG_ACTIVE_LEVEL=SPDLOG_LEVEL_DEBUG)
+    add_compile_definitions(SPDLOG_ACTIVE_LEVEL=SPDLOG_LEVEL_TRACE)
 elseif(CMAKE_BUILD_TYPE STREQUAL "Release")
     add_compile_options(
         -O3     #编译优化等级3
@@ -26,4 +26,6 @@ elseif(CMAKE_BUILD_TYPE STREQUAL "Release")
 endif()
 
 add_subdirectory(rtsp)
-# add_subdirectory(test)
+add_subdirectory(test)
+
+add_dependencies(test rtsp)
