@@ -30,3 +30,8 @@ sudo apt install libspdlog-dev
 - rockchip_mpp (自带1.3.8)
 - libdrm (自带2.4.104)
 
+## 使用
+> 注意加双引号""，否则会被shell解释为管道符
+```shell
+./test "rtsp://xxxxxxxx"
+```
