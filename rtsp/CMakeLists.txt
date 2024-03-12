@@ -36,13 +36,14 @@ file(GLOB_RECURSE SRC_FILES ${CMAKE_CURRENT_SOURCE_DIR}/*.cpp)
 list(FILTER SRC_FILES EXCLUDE REGEX "main\\.cpp$")
 
 message("BUILD: ${PROJECT_NAME}")
-add_library(${PROJECT_NAME} STATIC ${SRC_FILES})
-target_link_libraries(${PROJECT_NAME} PRIVATE 
+add_library(${PROJECT_NAME} SHARED ${SRC_FILES})
+target_link_libraries(${PROJECT_NAME} PUBLIC 
                                             PkgConfig::FFMPEG 
                                             spdlog::spdlog 
                                             ${OPENCV_LIBS} 
                                             PkgConfig::LIBMPP 
-                                            PkgConfig::LIBDRM)
+                                            PkgConfig::LIBDRM
+                                            ${SDL2_LIBRARIES})
 
 install(TARGETS rtsp DESTINATION lib)
 file(GLOB HEADERS ${CMAKE_CURRENT_SOURCE_DIR}/*.h)

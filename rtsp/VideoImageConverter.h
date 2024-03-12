@@ -34,8 +34,7 @@ namespace av
         enum AVPixelFormat dst_pix_fmt;
         enum AVCodecID dst_codec_id;
 
-        struct SwsContext *dst_sws_ctx = NULL;      // 这是给显示用的
-        // struct SwsContext *sws_ctx = NULL;          // 这是给算法用的
+        struct SwsContext *dst_sws_ctx = NULL;
 
         AVCodec *encoder_codec = NULL;
         AVCodecContext *encoder_codec_ctx = NULL;

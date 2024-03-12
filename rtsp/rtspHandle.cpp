@@ -260,7 +260,7 @@ void RTSPHandle::syncVideo(AVFrame *frame, bool &dropFrame, bool &dropQueque)
             auto diff = static_cast<unsigned int>(rtspInfo.video_last_ptsTime - rtspInfo.sys_elapsedTime);
 
             SPDLOG_TRACE("video,early: {}", diff);
-            av_usleep(diff * 1000);
+            // av_usleep(diff * 1000);     // 使帧延迟
         }
         else if (rtspInfo.video_last_ptsTime < rtspInfo.sys_elapsedTime) // 如果小于m_elapsedTime（落后），则记录落后时间
         {

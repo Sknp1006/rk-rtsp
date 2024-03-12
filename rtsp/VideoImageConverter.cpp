@@ -201,7 +201,6 @@ namespace av
             std::shared_ptr<AVFrame> dst_Clear(dst, [](AVFrame *p){
                                 av_freep(&p->data[0]);
                                 av_frame_free(&p); });
-            // scalexs(src, dst, AV_PIX_FMT_BGR24);
 
             scale(src, dst, 640, 640, AV_PIX_FMT_BGR24);
 

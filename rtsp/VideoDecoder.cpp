@@ -47,12 +47,12 @@ namespace av
     {
         try
         {
-            // auto start = std::chrono::system_clock::now();
+            auto start = std::chrono::system_clock::now();
             int ret = avcodec_send_packet(codecCtx, packet);
-            // SPDLOG_TRACE("avcodec_send_packet: '{0}'", ret);
-            // auto end = std::chrono::system_clock::now();
-            // std::chrono::duration<double, std::milli> elapsed = end - start;
-            // SPDLOG_DEBUG("avcodec_send_packet: '{0}'ms", elapsed.count());      // 毫秒
+            SPDLOG_TRACE("avcodec_send_packet: '{0}'", ret);
+            auto end = std::chrono::system_clock::now();
+            std::chrono::duration<double, std::milli> elapsed = end - start;
+            SPDLOG_DEBUG("avcodec_send_packet: '{0}'ms", elapsed.count());      // 毫秒
 
             if (ret < 0)
             {
@@ -66,18 +66,31 @@ namespace av
                 std::shared_ptr<AVFrame> Clear(pFrame, [](AVFrame *p){ av_frame_unref(p); });
                 ret = avcodec_receive_frame(codecCtx, pFrame);
 
-                // // 打印帧类型
-                //     // AV_PICTURE_TYPE_NONE = 0, ///< Undefined
-                //     // AV_PICTURE_TYPE_I,     ///< Intra
-                //     // AV_PICTURE_TYPE_P,     ///< Predicted
-                //     // AV_PICTURE_TYPE_B,     ///< Bi-dir predicted
-                //     // AV_PICTURE_TYPE_S,     ///< S(GMC)-VOP MPEG-4
-                //     // AV_PICTURE_TYPE_SI,    ///< Switching Intra
-                //     // AV_PICTURE_TYPE_SP,    ///< Switching Predicted
-                //     // AV_PICTURE_TYPE_BI,    ///< BI type
-                // AVPictureType frameType = pFrame->pict_type;
-                // char frameTypeName = av_get_picture_type_char(frameType);
-                // std::cout << "frameType: " << frameTypeName << std::endl;
+                // 打印帧类型
+                    // AV_PICTURE_TYPE_NONE = 0, ///< Undefined
+                    // AV_PICTURE_TYPE_I,     ///< Intra
+                    // AV_PICTURE_TYPE_P,     ///< Predicted
+                    // AV_PICTURE_TYPE_B,     ///< Bi-dir predicted
+                    // AV_PICTURE_TYPE_S,     ///< S(GMC)-VOP MPEG-4
+                    // AV_PICTURE_TYPE_SI,    ///< Switching Intra
+                    // AV_PICTURE_TYPE_SP,    ///< Switching Predicted
+                    // AV_PICTURE_TYPE_BI,    ///< BI type
+                // char av_get_picture_type_char(enum AVPictureType pict_type)
+                // {
+                //     switch (pict_type) {
+                //     case AV_PICTURE_TYPE_I:  return 'I';
+                //     case AV_PICTURE_TYPE_P:  return 'P';
+                //     case AV_PICTURE_TYPE_B:  return 'B';
+                //     case AV_PICTURE_TYPE_S:  return 'S';
+                //     case AV_PICTURE_TYPE_SI: return 'i';
+                //     case AV_PICTURE_TYPE_SP: return 'p';
+                //     case AV_PICTURE_TYPE_BI: return 'b';
+                //     default:                 return '?';
+                //     }
+                // }
+                AVPictureType frameType = pFrame->pict_type;
+                char frameTypeName = av_get_picture_type_char(frameType);
+                SPDLOG_DEBUG("frameType: '{0}'", frameTypeName);
 
                 SPDLOG_TRACE("avcodec_receive_frame: '{0}'", ret);
                 if (ret == AVERROR(EAGAIN) || ret == AVERROR_EOF)
