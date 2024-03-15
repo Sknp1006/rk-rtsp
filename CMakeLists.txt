@@ -26,6 +26,7 @@ elseif(CMAKE_BUILD_TYPE STREQUAL "Release")
 endif()
 
 add_subdirectory(rtsp)
+add_subdirectory(utils)
 add_subdirectory(test)
 
-add_dependencies(test rtsp)
+add_dependencies(test rtsp utils)

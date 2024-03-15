@@ -1,6 +1,7 @@
 #include "rtspHandle.h"
 #include <signal.h>
 #include "logger.h"
+#include "utils_time.h"
 
 static int exit_sig = 0;
 
@@ -23,8 +24,8 @@ int main(int argc, char **argv)
     {
         if (handle.getFrame(frame))
         {
-            SPDLOG_INFO("get frame: {} x {}", frame.size().width, frame.size().height);
-            std::this_thread::sleep_for(std::chrono::milliseconds(50));
+            SPDLOG_INFO("get frame: {} x {} -t {}", frame.size().width, frame.size().height, Utils::getCurrentTime().c_str());
+            // std::this_thread::sleep_for(std::chrono::milliseconds(50));
         }
     }
 }
