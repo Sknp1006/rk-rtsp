@@ -25,7 +25,7 @@ namespace av
         int numberOfMats();
 
     private:
-        int max_size = 8;
+        int max_size = 1;
         std::queue<cv::Mat> queue;
         std::mutex m_mutex;
         std::condition_variable m_cv;
