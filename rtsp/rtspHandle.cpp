@@ -129,6 +129,7 @@ void RTSPHandle::iteratePacket()
                 }
             }
             av_packet_unref(&packet);
+            std::this_thread::sleep_for(std::chrono::milliseconds(1)); // 线程休眠1毫秒
         }
         this->iterating_packet_thread_finished = true;
     }
@@ -187,6 +188,7 @@ void RTSPHandle::decodeRtsp()
                 this->videoDecoder->decode(&packet, f_onFrameAvailable); // 对获取到的数据包进行解码，然后将解码后的帧传给f_onFrameAvailable
             }
             av_packet_unref(&packet); // 释放packet
+            std::this_thread::sleep_for(std::chrono::milliseconds(1)); // 线程休眠1毫秒
         }
         this->decoding_video_thread_finished = true; // 将线程设置为true，表示线程执行完毕
     }
