@@ -281,4 +281,21 @@ void RTSPHandle::syncVideo(AVFrame *frame, bool &dropFrame, bool &dropQueque)
             }
         }
     }
+    {
+        if (rtspInfo.video_last_drop == 0)
+        {
+            rtspInfo.video_last_drop = (rtspInfo.video_last_ptsTime.load());
+            return;
+        }
+
+        auto diff_of_drop = static_cast<unsigned int>(rtspInfo.video_last_ptsTime - rtspInfo.video_last_drop);
+        if (diff_of_drop >= (1000.0 / FRAMERATE))
+        {
+            rtspInfo.video_last_drop = (rtspInfo.video_last_ptsTime.load());
+        }
+        else
+        {
+            dropFrame = true;
+        }
+    }
 }

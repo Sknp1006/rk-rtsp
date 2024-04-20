@@ -12,6 +12,10 @@
 
 using namespace av;
 
+#ifndef FRAMERATE
+#define FRAMERATE 25
+#endif
+
 //获取当前时间(时间为毫秒)
 inline int64_t getCurrentTime()
 {
@@ -73,6 +77,7 @@ struct RTSPInfo
     std::atomic<int64_t> sys_elapsedTime = 0;
     std::atomic<int64_t> sys_newElapsedTimeRefPoint = 0;
     std::atomic<int64_t> sys_baseElapsedTime = 0;
+    std::atomic<int64_t> video_last_drop=0;
 
     std::atomic<AVRational> video_time_base;
     std::atomic<double> video_last_pkt_duration = 0;
