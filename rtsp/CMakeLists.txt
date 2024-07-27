@@ -10,7 +10,7 @@ pkg_check_modules(FFMPEG REQUIRED IMPORTED_TARGET libavcodec
                                                     libswscale 
                                                     libavfilter 
                                                     libavdevice 
-                                                    libavresample)
+                                                    libswresample)
 
 #spdlog
 find_package(spdlog REQUIRED)
