@@ -7,6 +7,7 @@
 
 ## 第三方依赖
 
+- 自带的jellyfin为 `4.3.4-1rockchip` 版本，实测可用
 - jellyfin-ffmpeg ([v6.0.1-3](https://github.com/jellyfin/jellyfin-ffmpeg/releases/tag/v6.0.1-3))
 ```shell
 ./configure --enable-rkmpp --enable-version3 --enable-libdrm --enable-static --disable-shared --enable-pthreads --enable-zlib --disable-doc --disable-debug --disable-lzma --disable-vaapi --disable-vdpau --enable-shared
