@@ -12,11 +12,6 @@ extern "C"
 #include <libavutil/imgutils.h>
 
 #include <SDL2/SDL.h>
-#include <SDL2/SDL_audio.h>
-#include <SDL2/SDL_types.h>
-#include <SDL2/SDL_name.h>
-#include <SDL2/SDL_main.h>
-#include <SDL2/SDL_config.h>
 }
 
 namespace av

@@ -12,65 +12,10 @@
 
 using namespace av;
 
-#ifndef FRAMERATE
-#define FRAMERATE 25
+// 目前的帧率设计是只能慢不能快，以减少不必要的性能消耗
+#ifndef MAXFRAMERATE
+#define MAXFRAMERATE 100
 #endif
-
-//获取当前时间(时间为毫秒)
-inline int64_t getCurrentTime()
-{
-    auto now = std::chrono::system_clock::now();
-    auto d = std::chrono::duration_cast<std::chrono::milliseconds>(now.time_since_epoch());
-    return d.count();
-}
-//将获取到当前时间格式转换为00:00:00.000
-const inline std::string millisecondToHHMMSSZZZ(int64_t &v)
-{
-    int hour = 0;
-    int minute = 0;
-    int second = 0;
-    int millisecond = 0;
-
-    second = v / 1000;
-    millisecond = v % 1000;
-
-    if (second > 60)
-    {
-        minute = second / 60;
-        second = second % 60;
-    }
-    if (minute > 60)
-    {
-        hour = minute / 60;
-        minute = minute % 60;
-    }
-
-    char buf[sizeof("00:00:00.000") + 1] = {
-        0,
-    };
-    std::snprintf(buf, sizeof(buf), "%02d:%02d:%02d.%03d", hour, minute, second, millisecond);
-    return buf;
-}
-
-inline std::string timestampToString(time_t timestamp) {
-    char now[64];
-    struct tm *ttime;
-    ttime = localtime(&timestamp);
-    strftime(now,64,"%Y-%m-%d %H:%M:%S",ttime);
-    return std::string(now);
-}
-
-inline std::string formatTimestamp(const std::string& format)
-{
-    // 获取当前时间戳
-    auto now = std::chrono::system_clock::now();
-    std::time_t timestamp = std::chrono::system_clock::to_time_t(now);
-
-    // 格式化时间戳为字符串
-    std::stringstream ss;
-    ss << std::put_time(std::localtime(&timestamp), format.c_str());
-    return ss.str();
-}
 
 struct RTSPInfo
 {

@@ -5,6 +5,13 @@ extern "C"
 #include <libavformat/avformat.h>
 #include <libavcodec/avcodec.h>
 }
+//获取当前时间(时间为毫秒)
+int64_t getCurrentTime()
+{
+    auto now = std::chrono::system_clock::now();
+    auto d = std::chrono::duration_cast<std::chrono::milliseconds>(now.time_since_epoch());
+    return d.count();
+}
 /// @brief 构造函数
 /// @param rtsp_url 
 RTSPHandle::RTSPHandle(std::string rtsp_url)
@@ -289,7 +296,7 @@ void RTSPHandle::syncVideo(AVFrame *frame, bool &dropFrame, bool &dropQueque)
         }
 
         auto diff_of_drop = static_cast<unsigned int>(rtspInfo.video_last_ptsTime - rtspInfo.video_last_drop);
-        if (diff_of_drop >= (1000.0 / FRAMERATE))
+        if (diff_of_drop >= (1000.0 / MAXFRAMERATE))
         {
             rtspInfo.video_last_drop = (rtspInfo.video_last_ptsTime.load());
         }
