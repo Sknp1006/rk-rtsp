@@ -22,5 +22,5 @@ cmake -B . -S ${ROOT_PWD} \
     -DCMAKE_MAKE_PROGRAM=ninja \
     -GNinja
 
-ninja
+ninja -j6
 ninja install
