@@ -77,7 +77,7 @@ void Utils::Timer::start()
 void Utils::Timer::run()
 {
     SPDLOG_TRACE("Utils::Timer::run()");
-    this->formatTime();                                             // 格式化时间
+    this->formatTime();
     timestamp now;
     do
     {
@@ -87,16 +87,19 @@ void Utils::Timer::run()
         {
             SPDLOG_DEBUG("Utils::Timer::run() : now < m_begin");
             this->m_State = TimerState::WAITING;
+            if (this->m_onWaitCallback) this->m_onWaitCallback();
         }
         else if (now >= this->m_begin && now < this->m_end)
         {
             SPDLOG_DEBUG("Utils::Timer::run() : now >= m_begin && now < m_end");
             this->m_State = TimerState::RUNNING;
+            if (this->m_onRunCallback) this->m_onRunCallback();
         }
         else
         {
             SPDLOG_DEBUG("Utils::Timer::run() : now >= m_end");
             this->m_State = TimerState::STOPPED;
+            if (this->m_onStopCallback) this->m_onStopCallback();
         }
         std::this_thread::sleep_for(std::chrono::milliseconds(50));
     } while (this->m_State.load() != TimerState::QUIT);
@@ -127,13 +130,13 @@ Utils::TimerState Utils::Timer::getState() const
 }
 /// @brief 获取开始时间
 /// @return 
-std::string Utils::Timer::getBeginTime()
+std::string Utils::Timer::getBeginTime() const
 {
     return Utils::timestamp2string(std::chrono::system_clock::to_time_t(this->m_begin), "%Y-%m-%d %H:%M:%S");
 }
 /// @brief 获取结束时间
 /// @return 
-std::string Utils::Timer::getEndTime()
+std::string Utils::Timer::getEndTime() const
 {
     return Utils::timestamp2string(std::chrono::system_clock::to_time_t(this->m_end), "%Y-%m-%d %H:%M:%S");
 }
