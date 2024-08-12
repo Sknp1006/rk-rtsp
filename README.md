@@ -64,11 +64,7 @@ cd ${ROOT_PWD}
 ```
 
 ### 效果演示
-<video width="600" controls>
-  <source src="./test/example.mp4" type="video/mp4">
-  您的浏览器不支持 HTML5 视频标签。
-</video>
-
+![example](./test/example.gif) 
 
 ## 致谢
 
