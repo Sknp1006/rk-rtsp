@@ -72,8 +72,4 @@ private:
     std::shared_ptr<std::thread> decoding_video_thread;
     std::atomic<bool> decoding_video_thread_finished = false;
     std::atomic<bool> is_decoding_video_thread_failed = false;
-
-    std::atomic<bool> frame_ready = false;
-    cv::Mat frame;
-    std::mutex m_mutex;
 };

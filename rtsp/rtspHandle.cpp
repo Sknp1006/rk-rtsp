@@ -44,7 +44,7 @@ RTSPHandle::RTSPHandle(std::string rtsp_url)
     catch(const std::exception& e)
     {
         SPDLOG_ERROR("RTSPHandle::RTSPHandle() failed.");
-        throw std::runtime_error("RTSPHandle::RTSPHandle() failed.");
+        throw std::runtime_error("RTSPHandle::RTSPHandle() failed: " + std::string(e.what()));
     }
 }
 /// @brief 析构函数
