@@ -64,7 +64,7 @@ cd ${ROOT_PWD}
 ```
 
 ### 效果演示
-![example](test/example.gif) 
+![example](test/palace.gif) 
 
 ## 致谢
 
