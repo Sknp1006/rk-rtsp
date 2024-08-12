@@ -30,12 +30,45 @@ sudo apt install libspdlog-dev
 
 - rockchip_mpp (自带1.3.8)
 - libdrm (自带2.4.104)
-
-## 使用
-> 注意加双引号""，否则会被shell解释为管道符
-```shell
-./test "rtsp://xxxxxxxx"
+- librga (自带1.9.0)
+```bash
+> strings /usr/lib/aarch64-linux-gnu/librga.so |grep rga_api |grep version
+rga_api version 1.9.2_[0]
 ```
+
+## test示例
+### 编译示例
+> 执行编译脚本，默认编译所有模块
+```bash
+./build.sh
+```
+### 编辑启动脚本
+> 在 `install/bin` 目录下创建 run.sh 脚本，内容如下:
+```bash
+#!/bin/bash
+set -e
+
+# 获取绝对路径
+ROOT_PWD=$( cd "$( dirname $0 )" && cd -P "$( dirname "$SOURCE" )" && pwd )
+export LD_LIBRARY_PATH=$LD_LIBRARY_PATH:${ROOT_PWD}/../lib
+cd ${ROOT_PWD}
+
+./test $1
+```
+
+### 执行启动脚本
+> 需要传入一个RTSP地址作为参数
+```bash
+> cd install/bin
+> ./run.sh "rtsp://your_rtsp_url:port/stream"
+```
+
+### 效果演示
+<video width="600" controls>
+  <source src="./test/example.mp4" type="video/mp4">
+  您的浏览器不支持 HTML5 视频标签。
+</video>
+
 
 ## 致谢
 
