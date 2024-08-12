@@ -30,7 +30,7 @@ sudo apt install libspdlog-dev
 
 - rockchip_mpp (自带1.3.8)
 - libdrm (自带2.4.104)
-- librga (自带1.9.0)
+- librga (自带1.9.2)
 ```bash
 > strings /usr/lib/aarch64-linux-gnu/librga.so |grep rga_api |grep version
 rga_api version 1.9.2_[0]
@@ -64,7 +64,7 @@ cd ${ROOT_PWD}
 ```
 
 ### 效果演示
-![example](./test/example.gif) 
+![example](test/example.gif) 
 
 ## 致谢
 
