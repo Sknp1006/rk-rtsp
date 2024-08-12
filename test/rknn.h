@@ -14,9 +14,6 @@
 #include "rknn_api.h"
 #include "preprocess.h"
 
-#include <rtspHandle.h>
-#include <SDL2/SDL.h>
-
 #define PERF_WITH_POST 1
 /*-------------------------------------------
                   Functions

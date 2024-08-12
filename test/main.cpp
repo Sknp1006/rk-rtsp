@@ -75,8 +75,8 @@ void exit_signal(int sig)
 int sdl_loop(std::string url)
 {
     // 窗口大小
-    const int SCREEN_WIDTH = 1280;
-    const int SCREEN_HEIGHT = 720;
+    int SCREEN_WIDTH = 1280;
+    int SCREEN_HEIGHT = 720;
 
     RKNNHandle rknnHandle = RKNNHandle("./model/RK3588/yolov5s-640-640.rknn");
 
@@ -127,6 +127,14 @@ int sdl_loop(std::string url)
 
         if (handle->getFrame(frame))
         {
+            // 自适应窗口大小
+            if (frame.size().width != SCREEN_WIDTH || frame.size().height != SCREEN_HEIGHT)
+            {
+                SCREEN_WIDTH = frame.size().width;
+                SCREEN_HEIGHT = frame.size().height;
+                SDL_SetWindowSize(window, SCREEN_WIDTH, SCREEN_HEIGHT);
+            }
+
             rknnHandle.infer(frame);
             SDL_Surface *surface = matToSurface(frame);
             if (surface)
@@ -148,6 +156,7 @@ int sdl_loop(std::string url)
         if (duration.count() < 1000 / FRAME_RATE) {
             SDL_Delay(1000 / FRAME_RATE - duration.count());
         }
+        SPDLOG_INFO("duration: {}ms", duration.count());
     }
     handle->stop();
 
