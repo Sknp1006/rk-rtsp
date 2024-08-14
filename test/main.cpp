@@ -1,4 +1,4 @@
-#include "rtspHandle.h"
+#include "rkrtsp.h"
 #include <signal.h>
 #include "logger.h"
 #include "utils_time.h"
@@ -12,19 +12,6 @@
 
 static int exit_sig = 0;
 
-void thread_func(std::string url)
-{
-    RTSPHandle handle = RTSPHandle(url);
-    cv::Mat frame;
-    while (!exit_sig)
-    {
-        if (handle.getFrame(frame))
-        {
-            std::cout << "Thread id:" << std::this_thread::get_id() << " " << "get frame: " << frame.size().width << " x " << frame.size().height << std::endl;
-        }
-    }
-}
-
 // 将 cv::Mat 转换为 SDL_Surface
 SDL_Surface *matToSurface(const cv::Mat &mat)
 {
@@ -37,17 +24,17 @@ SDL_Surface *matToSurface(const cv::Mat &mat)
     }
     else if (mat.channels() == 3)
     {
-        rmask = 0x00ff0000;  // Red
-        gmask = 0x0000ff00;  // Green
-        bmask = 0x000000ff;  // Blue
+        rmask = 0x00ff0000; // Red
+        gmask = 0x0000ff00; // Green
+        bmask = 0x000000ff; // Blue
         amask = 0;
     }
     else if (mat.channels() == 4)
     {
-        rmask = 0x00ff0000;  // Red
-        gmask = 0x0000ff00;  // Green
-        bmask = 0x000000ff;  // Blue
-        amask = 0xff000000;  // Alpha
+        rmask = 0x00ff0000; // Red
+        gmask = 0x0000ff00; // Green
+        bmask = 0x000000ff; // Blue
+        amask = 0xff000000; // Alpha
     }
     else
     {
@@ -81,7 +68,7 @@ int sdl_loop(std::string url)
     RKNNHandle rknnHandle = RKNNHandle("./model/RK3588/yolov5s-640-640.rknn");
 
     // 初始化
-    if (SDL_Init(SDL_INIT_VIDEO || SDL_INIT_AUDIO) < 0)
+    if (SDL_Init(SDL_INIT_VIDEO | SDL_INIT_AUDIO) < 0)
     {
         SDL_Log("SDL could not initialize! SDL_Error: %s\n", SDL_GetError());
         return -1;
@@ -101,39 +88,35 @@ int sdl_loop(std::string url)
         return -1;
     }
 
-    RTSPHandle *handle;
-    try
-    {
-        handle = new RTSPHandle(url);
-    }
-    catch(const std::exception& e)
-    {
-        SPDLOG_ERROR("RTSPHandle error: {}", e.what());
-        delete handle;
-        return -1;
-    }
-    
+    LONG64 ctx = CreateRKRTSP(url.c_str());
+
     cv::Mat frame;
     SDL_Event event;
+    ImageData image;
 
     while (!exit_sig)
     {
         auto start = std::chrono::system_clock::now();
-        while (SDL_PollEvent(&event) != 0) {
-            if (event.type == SDL_QUIT) {
+        while (SDL_PollEvent(&event) != 0)
+        {
+            if (event.type == SDL_QUIT)
+            {
                 exit_sig = 1;
             }
         }
 
-        if (handle->getFrame(frame))
+        // if (handle->getFrame(frame))
+        if (GetFrame(ctx, image) == 0)
         {
             // 自适应窗口大小
-            if (frame.size().width != SCREEN_WIDTH || frame.size().height != SCREEN_HEIGHT)
+            if (image.width != SCREEN_WIDTH || image.height != SCREEN_HEIGHT)
             {
-                SCREEN_WIDTH = frame.size().width;
-                SCREEN_HEIGHT = frame.size().height;
+                SCREEN_WIDTH = image.width;
+                SCREEN_HEIGHT = image.height;
                 SDL_SetWindowSize(window, SCREEN_WIDTH, SCREEN_HEIGHT);
             }
+
+            frame = cv::Mat(image.height, image.width, CV_8UC3, image.data);
 
             rknnHandle.infer(frame);
             SDL_Surface *surface = matToSurface(frame);
@@ -153,12 +136,13 @@ int sdl_loop(std::string url)
         }
         auto end = std::chrono::system_clock::now();
         auto duration = std::chrono::duration_cast<std::chrono::milliseconds>(end - start);
-        if (duration.count() < 1000 / FRAME_RATE) {
+        if (duration.count() < 1000 / FRAME_RATE)
+        {
             SDL_Delay(1000 / FRAME_RATE - duration.count());
         }
         SPDLOG_INFO("duration: {}ms", duration.count());
     }
-    handle->stop();
+    ReleaseRKRTSP(ctx);
 
     // 销毁窗口和渲染器
     SDL_DestroyRenderer(renderer);
@@ -175,20 +159,6 @@ int main(int argc, char **argv)
     SPDLOG_DEBUG("url: {}", url.c_str());
 
     signal(SIGTERM, exit_signal);
-
-    {
-        // 多线程测试
-        // const int n = 8;
-        // std::array<std::thread, n> threads;
-        // for (auto &t : threads)
-        // {
-        //     t = std::thread(thread_func, url);
-        // }
-        // for (auto &t : threads)
-        // {
-        //     t.join();
-        // }
-    }
 
     // 可视化测试
     sdl_loop(url);

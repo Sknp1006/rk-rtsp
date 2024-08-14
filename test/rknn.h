@@ -304,7 +304,6 @@ public:
 
         ret = rknn_outputs_release(ctx, io_num.n_output, outputs);
         return 0;
-        return 0;
     }
 
 private:
