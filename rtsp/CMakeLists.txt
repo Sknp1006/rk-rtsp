@@ -35,13 +35,13 @@ list(FILTER SRC_FILES EXCLUDE REGEX "main\\.cpp$")
 message("BUILD: ${PROJECT_NAME}")
 add_library(${PROJECT_NAME} SHARED ${SRC_FILES})
 target_link_libraries(${PROJECT_NAME} PUBLIC 
-                                            PkgConfig::FFMPEG 
-                                            spdlog::spdlog 
-                                            ${OPENCV_LIBS} 
-                                            PkgConfig::LIBMPP 
-                                            PkgConfig::LIBDRM
-                                            ${SDL2_LIBRARIES})
+                                        PkgConfig::FFMPEG 
+                                        spdlog::spdlog 
+                                        ${OPENCV_LIBS} 
+                                        PkgConfig::LIBMPP 
+                                        PkgConfig::LIBDRM
+                                        ${SDL2_LIBRARIES})
 
 install(TARGETS rtsp DESTINATION lib)
-file(GLOB HEADERS ${CMAKE_CURRENT_SOURCE_DIR}/*.h)
+file(GLOB HEADERS ${CMAKE_CURRENT_SOURCE_DIR}/rkrtsp.h)
 install(FILES ${HEADERS} DESTINATION include/rtsp)
