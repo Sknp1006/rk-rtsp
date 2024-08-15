@@ -29,4 +29,4 @@ add_subdirectory(rtsp)
 add_subdirectory(utils)
 add_subdirectory(test)
 
-add_dependencies(test rtsp utils)
+add_dependencies(test rkrtsp utils)

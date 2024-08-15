@@ -26,9 +26,9 @@ add_executable(${PROJECT_NAME} main.cpp
                                 preprocess.cc
                                 postprocess.cc)
 target_include_directories(${PROJECT_NAME} PUBLIC 
-                                    rtsp 
+                                    rkrtsp 
                                     utils)
-target_link_libraries(${PROJECT_NAME} PUBLIC rtsp utils 
+target_link_libraries(${PROJECT_NAME} PUBLIC rkrtsp utils 
                                         ${RKNN_RT_LIB}
                                         ${RGA_LIB}
                                         ${OpenCV_LIBS})

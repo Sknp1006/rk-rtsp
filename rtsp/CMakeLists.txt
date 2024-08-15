@@ -1,4 +1,4 @@
-project(rtsp LANGUAGES CXX C)
+project(rkrtsp LANGUAGES CXX C)
 
 
 find_package(PkgConfig REQUIRED)
@@ -42,6 +42,6 @@ target_link_libraries(${PROJECT_NAME} PUBLIC
                                         PkgConfig::LIBDRM
                                         ${SDL2_LIBRARIES})
 
-install(TARGETS rtsp DESTINATION lib)
+install(TARGETS ${PROJECT_NAME} DESTINATION lib)
 file(GLOB HEADERS ${CMAKE_CURRENT_SOURCE_DIR}/rkrtsp.h)
 install(FILES ${HEADERS} DESTINATION include/rtsp)
