@@ -105,7 +105,6 @@ int sdl_loop(std::string url)
             }
         }
 
-        // if (handle->getFrame(frame))
         if (GetFrame(ctx, image) == 0)
         {
             // 自适应窗口大小
@@ -133,6 +132,7 @@ int sdl_loop(std::string url)
                     SDL_DestroyTexture(texture);
                 }
             }
+            free(image.data);
         }
         auto end = std::chrono::system_clock::now();
         auto duration = std::chrono::duration_cast<std::chrono::milliseconds>(end - start);
