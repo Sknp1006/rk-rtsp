@@ -233,6 +233,7 @@ public:
         if (img_width != width || img_height != height)
         {
             // 直接缩放采用RGA加速
+            auto start = std::chrono::high_resolution_clock::now();
             if (option == "resize")
             {
                 printf("resize image by rga\n");
@@ -242,8 +243,6 @@ public:
                     fprintf(stderr, "resize with rga error\n");
                     return -1;
                 }
-                // // 保存预处理图片
-                // cv::imwrite("resize_input.jpg", resized_img);
             }
             else if (option == "letterbox")
             {
@@ -252,8 +251,6 @@ public:
                 scale_w = min_scale;
                 scale_h = min_scale;
                 letterbox(img, resized_img, pads, min_scale, target_size);
-                // // 保存预处理图片
-                // cv::imwrite("letterbox_input.jpg", resized_img);
             }
             else
             {
@@ -261,6 +258,8 @@ public:
                 return -1;
             }
             inputs[0].buf = resized_img.data;
+            auto end = std::chrono::high_resolution_clock::now();
+            printf("resize use %f ms\n", std::chrono::duration_cast<std::chrono::microseconds>(end - start).count() / 1000.0);
         }
         else
         {
@@ -328,5 +327,5 @@ private:
     rga_buffer_t src;
     rga_buffer_t dst;
 
-    std::string option = "letterbox";
+    std::string option = "resize";
 };
