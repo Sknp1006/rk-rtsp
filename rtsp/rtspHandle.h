@@ -56,6 +56,7 @@ private:
 private:
     RTSPInfo rtspInfo;
     PacketQueue video_queque;
+    PacketQueue audio_queque;
     std::shared_ptr<PacketIterator> packetIterator;
     std::shared_ptr<VideoDecoder> videoDecoder;
     std::shared_ptr<VideoImageConverter> videoImageConverter;

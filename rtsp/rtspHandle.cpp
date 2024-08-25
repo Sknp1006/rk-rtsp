@@ -22,7 +22,7 @@ RTSPHandle::RTSPHandle(std::string rtsp_url)
     try
     {
         this->packetIterator = std::make_shared<PacketIterator>();
-        this->packetIterator->open(rtsp_url, true, false);          // 不成功会直接退出，不会开启线程
+        this->packetIterator->open(rtsp_url, true, true);          // 不成功会直接退出，不会开启线程
         if (this->packetIterator->videoIsOK())
         {
             matQueue = std::make_shared<MatQueue>();
@@ -133,6 +133,10 @@ void RTSPHandle::iteratePacket()
                 if (AVMEDIA_TYPE_VIDEO == mediaType && withVideo)
                 {
                     this->video_queque.put(&packet);
+                }
+                else if (AVMEDIA_TYPE_AUDIO == mediaType && withAudio)
+                {
+                    this->audio_queque.put(&packet);
                 }
             }
             av_packet_unref(&packet);
