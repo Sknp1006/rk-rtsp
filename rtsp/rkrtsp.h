@@ -12,6 +12,9 @@ typedef int64_t LONG64;
 extern "C"
 {
 #endif
+
+#ifndef IMGDATA
+#define IMGDATA
     struct ImageData
     {
         unsigned char *data;
@@ -25,6 +28,8 @@ extern "C"
             delete[] data;
         }
     };
+#endif
+
     API_EXPORT LONG64 CreateRKRTSP(const char *rtsp_url);
     API_EXPORT void ReleaseRKRTSP(LONG64 ctx);
 
