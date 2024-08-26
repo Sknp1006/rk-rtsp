@@ -25,7 +25,7 @@ RTSPHandle::RTSPHandle(std::string rtsp_url)
         this->packetIterator->open(rtsp_url, true, true);          // 不成功会直接退出，不会开启线程
         if (this->packetIterator->videoIsOK())
         {
-            matQueue = std::make_shared<MatQueue>();
+            matQueue = std::make_shared<QueueBase<cv::Mat>>();
             rtspInfo.video_time_base = this->packetIterator->time_base();
             AVCodecContext *codecContext = this->packetIterator->video_codecCtx();
             this->videoDecoder = std::make_shared<VideoDecoder>(codecContext);
@@ -75,12 +75,12 @@ void RTSPHandle::stop()
     if (this->is_decoding_rtsp.load() == RTSPState::RUNNING)
     {
         SPDLOG_TRACE("RTSPHandle::stop() stopping decoding_video_thread");
-        this->is_decoding_rtsp.store(RTSPState::STOPPED);
+        this->is_decoding_rtsp.store(RTSPState::STOPPED, std::memory_order_release);
         if (this->decoding_video_thread->joinable())
         {
             this->decoding_video_thread->join();
         }
-        this->is_decoding_rtsp.store(RTSPState::NOTCREATE);
+        this->is_decoding_rtsp.store(RTSPState::NOTCREATE, std::memory_order_release);
         SPDLOG_DEBUG("RTSPHandle::stop() stopped decoding_video_thread");
     }
     
@@ -88,12 +88,12 @@ void RTSPHandle::stop()
     if (this->is_iterating_packet.load() == RTSPState::RUNNING)
     {
         SPDLOG_TRACE("RTSPHandle::stop() stopping iterating_packet_thread");
-        this->is_iterating_packet.store(RTSPState::STOPPED);
+        this->is_iterating_packet.store(RTSPState::STOPPED, std::memory_order_release);
         if (this->iterating_packet_thread->joinable())
         {
             this->iterating_packet_thread->join();
         }
-        this->is_iterating_packet.store(RTSPState::NOTCREATE);
+        this->is_iterating_packet.store(RTSPState::NOTCREATE, std::memory_order_release);
         SPDLOG_DEBUG("RTSPHandle::stop() stopped iterating_packet_thread");
     }
 
@@ -115,7 +115,7 @@ void RTSPHandle::iteratePacket()
         bool withVideo = this->packetIterator->videoIsOK() && this->videoDecoder && this->videoDecoder->isOK();
         bool withAudio = false;
 
-        this->is_iterating_packet.store(RTSPState::RUNNING);
+        this->is_iterating_packet.store(RTSPState::RUNNING, std::memory_order_release);
         SPDLOG_DEBUG("withVideo: {0},withAudio: {1}", withVideo, withAudio);
         while(this->is_iterating_packet.load() == RTSPState::RUNNING)
         {
@@ -186,7 +186,7 @@ void RTSPHandle::decodeRtsp()
             }
         };
 
-        this->is_decoding_rtsp.store(RTSPState::RUNNING);
+        this->is_decoding_rtsp.store(RTSPState::RUNNING, std::memory_order_release); // 将解码线程设置为运行状态
         AVPacket packet;         // 定义一个结构体变量
         av_init_packet(&packet); // 初始化该结构体
         while(this->is_decoding_rtsp.load() == RTSPState::RUNNING)
