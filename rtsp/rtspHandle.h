@@ -60,7 +60,8 @@ private:
     std::shared_ptr<PacketIterator> packetIterator;
     std::shared_ptr<VideoDecoder> videoDecoder;
     std::shared_ptr<VideoImageConverter> videoImageConverter;
-    std::shared_ptr<MatQueue> matQueue;
+    // std::shared_ptr<MatQueue> matQueue;
+    std::shared_ptr<QueueBase<cv::Mat>> matQueue;
 
     // 拉流线程
     std::atomic<RTSPState> is_iterating_packet;
