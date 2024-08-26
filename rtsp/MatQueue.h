@@ -22,12 +22,12 @@ namespace av
         int get(T &data, bool block);
         void flush();
         void quit();
-        int size();
+        int size() const;
 
     private:
         int max_size = 1;
         std::queue<T> queue;
-        std::mutex m_mutex;
+        mutable std::mutex m_mutex;
         std::condition_variable m_cv;
         int m_quit = 0;
     };
@@ -83,7 +83,7 @@ namespace av
     }
 
     template <class T>
-    int QueueBase<T>::size()
+    int QueueBase<T>::size() const
     {
         std::unique_lock<std::mutex> lock(m_mutex);
         return queue.size();
