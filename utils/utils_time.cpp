@@ -1,5 +1,19 @@
 #include "utils_time.h"
 #include <spdlog/spdlog.h>
+#include <regex>
+/// @brief 判断日期字符串是否为有效的日期格式
+/// @param dateTimeStr 
+/// @return 
+bool isValidDateTimeFormat(const std::string& dateTimeStr) {
+    // 定义正则表达式来匹配 "%Y-%m-%d %H:%M:%S" 格式
+    const std::regex pattern(R"(\d{4}-\d{2}-\d{2} \d{2}:\d{2}:\d{2})");
+    return std::regex_match(dateTimeStr, pattern);
+}
+bool isValidTimeFormat(const std::string& timeStr) {
+    // 定义正则表达式来匹配 "%H:%M:%S" 格式
+    const std::regex pattern(R"(\d{2}:\d{2}:\d{2})");
+    return std::regex_match(timeStr, pattern);
+}
 /// @brief 将时间戳转换成对应格式的字符串
 /// @param timestamp 时间戳
 /// @param fmt 时间格式
@@ -79,6 +93,7 @@ void Utils::Timer::run()
     SPDLOG_TRACE("Utils::Timer::run()");
     this->formatTime();
     timestamp now;
+    TimerState previousState = this->m_State.load(std::memory_order_relaxed);
     do
     {
         now = std::chrono::system_clock::now();
@@ -86,23 +101,41 @@ void Utils::Timer::run()
         if (now < this->m_begin)
         {
             SPDLOG_DEBUG("Utils::Timer::run() : now < m_begin");
-            this->m_State = TimerState::WAITING;
-            if (this->m_onWaitCallback) this->m_onWaitCallback();
+            this->m_State.store(TimerState::WAITING, std::memory_order_relaxed);
         }
         else if (now >= this->m_begin && now < this->m_end)
         {
             SPDLOG_DEBUG("Utils::Timer::run() : now >= m_begin && now < m_end");
-            this->m_State = TimerState::RUNNING;
-            if (this->m_onRunCallback) this->m_onRunCallback();
+            this->m_State.store(TimerState::RUNNING, std::memory_order_relaxed);
         }
         else
         {
             SPDLOG_DEBUG("Utils::Timer::run() : now >= m_end");
-            this->m_State = TimerState::STOPPED;
-            if (this->m_onStopCallback) this->m_onStopCallback();
+            this->m_State.store(TimerState::STOPPED, std::memory_order_relaxed);
+        }
+
+        // 如果状态发生变化，则调用相应的回调函数
+        TimerState currentState = this->m_State.load(std::memory_order_relaxed);
+        if (currentState != previousState)
+        {
+            switch (currentState)
+            {
+                case TimerState::WAITING:
+                    if (this->m_onWaitCallback) this->m_onWaitCallback();
+                    break;
+                case TimerState::RUNNING:
+                    if (this->m_onRunCallback) this->m_onRunCallback();
+                    break;
+                case TimerState::STOPPED:
+                    if (this->m_onStopCallback) this->m_onStopCallback();
+                    break;
+                default:
+                    break;
+            }
+            previousState = currentState;
         }
         std::this_thread::sleep_for(std::chrono::milliseconds(50));
-    } while (this->m_State.load() != TimerState::QUIT);
+    } while (this->m_State.load(std::memory_order_relaxed) != TimerState::QUIT);
     this->m_thread_finished = true;
 }
 /// @brief 计时器停止
@@ -111,9 +144,9 @@ void Utils::Timer::stop()
     SPDLOG_TRACE("Utils::Timer::stop()");
 
     SPDLOG_DEBUG("Utils::Timer::stop() stopping timer.");
-    if (this->m_State.load() != TimerState::QUIT)
+    if (this->m_State.load(std::memory_order_relaxed) != TimerState::QUIT)
     {
-        this->m_State.store(TimerState::QUIT);
+        this->m_State.store(TimerState::QUIT, std::memory_order_relaxed);
         if (this->m_thread->joinable())
         {
             this->m_thread->join();
@@ -126,7 +159,7 @@ void Utils::Timer::stop()
 Utils::TimerState Utils::Timer::getState() const
 {
     SPDLOG_TRACE("Utils::Timer::getState()");
-    return this->m_State.load();
+    return this->m_State.load(std::memory_order_relaxed);
 }
 /// @brief 获取开始时间
 /// @return 
@@ -144,10 +177,27 @@ std::string Utils::Timer::getEndTime() const
 void Utils::Timer::formatTime()
 {
     SPDLOG_TRACE("Utils::Timer::formatTime()");
-    std::string begin = fmt::format("{} {}", this->today, this->m_beginStr);
-    std::string end = fmt::format("{} {}", this->today, this->m_endStr);
-    this->m_begin = std::chrono::system_clock::from_time_t(Utils::string2timestamp(begin.c_str(), "%Y-%m-%d %H:%M:%S"));
-    this->m_end = std::chrono::system_clock::from_time_t(Utils::string2timestamp(end.c_str(), "%Y-%m-%d %H:%M:%S"));
+    if (isValidDateTimeFormat(this->m_beginStr) && isValidDateTimeFormat(this->m_endStr))
+    {
+        // TODO: 可能传入的不是今天的日期
+        this->m_begin = std::chrono::system_clock::from_time_t(Utils::string2timestamp(this->m_beginStr.c_str(), "%Y-%m-%d %H:%M:%S"));
+        this->m_end = std::chrono::system_clock::from_time_t(Utils::string2timestamp(this->m_endStr.c_str(), "%Y-%m-%d %H:%M:%S"));
+        return;
+    }
+    else if (isValidTimeFormat(this->m_beginStr) && isValidTimeFormat(this->m_endStr))
+    {
+        std::string begin = fmt::format("{} {}", this->today, this->m_beginStr);
+        std::string end = fmt::format("{} {}", this->today, this->m_endStr);
+
+        this->m_begin = std::chrono::system_clock::from_time_t(Utils::string2timestamp(begin.c_str(), "%H:%M:%S"));
+        this->m_end = std::chrono::system_clock::from_time_t(Utils::string2timestamp(end.c_str(), "%H:%M:%S"));
+        return;
+    }
+    else
+    {
+        SPDLOG_ERROR("Utils::Timer::formatTime() : Invalid time format.");
+        throw std::runtime_error("Utils::Timer::formatTime() : Invalid time format.");
+    }
 }
 /// @brief 更新日期
 /// @return 更新了日期返回true
