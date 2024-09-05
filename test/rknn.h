@@ -186,6 +186,8 @@ public:
         // init rga context
         memset(&src, 0, sizeof(src));
         memset(&dst, 0, sizeof(dst));
+
+        rknn_set_core_mask(ctx, (rknn_core_mask)RKNN_NPU_CORE_0_1_2);
     }
 
     ~RKNNHandle()
