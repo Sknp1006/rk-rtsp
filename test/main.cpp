@@ -96,7 +96,7 @@ int sdl_loop(std::string url)
 
     while (!exit_sig)
     {
-        auto start = std::chrono::system_clock::now();
+        auto start = std::chrono::steady_clock::now();
         while (SDL_PollEvent(&event) != 0)
         {
             if (event.type == SDL_QUIT)
@@ -134,11 +134,11 @@ int sdl_loop(std::string url)
             }
             free(image.data);
         }
-        auto end = std::chrono::system_clock::now();
+        auto end = std::chrono::steady_clock::now();
         auto duration = std::chrono::duration_cast<std::chrono::milliseconds>(end - start);
-        if (duration.count() < 1000 / FRAME_RATE)
+        if (duration.count() < 1000.0 / FRAME_RATE)
         {
-            SDL_Delay(1000 / FRAME_RATE - duration.count());
+            SDL_Delay(1000.0 / FRAME_RATE - duration.count());
         }
         SPDLOG_INFO("duration: {}ms", duration.count());
     }
