@@ -2,7 +2,7 @@
 set -e
 
 TARGET_SOC="RK3588"
-BUILD_TYPE="Release"
+BUILD_TYPE=${1:-"Release"}
 
 # 获取绝对路径
 ROOT_PWD=$( cd "$( dirname $0 )" && cd -P "$( dirname "$SOURCE" )" && pwd )

@@ -24,6 +24,7 @@ elseif(CMAKE_BUILD_TYPE STREQUAL "Release")
     )
     add_compile_definitions(SPDLOG_ACTIVE_LEVEL=SPDLOG_LEVEL_INFO)
 endif()
+message(STATUS "Build type: ${CMAKE_BUILD_TYPE}")
 
 add_subdirectory(rtsp)
 add_subdirectory(utils)
